@@ -1,15 +1,19 @@
 import "./globals.css";
-import Navbar from "../components/Navbar";
+import ErrorCatcher from "../components/ErrorCatcher";
 
 export const metadata = {
-  title: "OK Crick App",
-  description: "Cricket Tournament Scoring App",
+  title: "OKCrick",
+  description: "Live scoring powered by Firebase",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <ErrorCatcher>
+          {children}
+        </ErrorCatcher>
+      </body>
     </html>
   );
 }

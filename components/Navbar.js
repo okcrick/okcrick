@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, LogOut } from "lucide-react";
-import { auth } from "../lib/firebase"; // apni firebase file ka path sahi rakho
+import { Menu, X, LogOut } from "lucide-react"; // ✅ icons from lucide-react
+import { auth } from "../lib/firebase";
 import { signOut, onAuthStateChanged } from "firebase/auth";
 
 export default function Navbar() {
@@ -10,7 +10,9 @@ export default function Navbar() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => setUser(u));
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
     return () => unsubscribe();
   }, []);
 
@@ -19,28 +21,27 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-green-600 text-white shadow-md">
-      <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-        {/* Logo */}
-        <Link href="/" className="text-xl font-bold tracking-wide">
+    <nav className="bg-green-600 text-white shadow-md fixed w-full z-50 top-0">
+      <div className="max-w-6xl mx-auto px-4 flex justify-between items-center h-16">
+        {/* Logo / Title */}
+        <Link href="/" className="text-2xl font-bold tracking-wide">
           OKCrick 🏏
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex space-x-6 items-center">
-          <Link href="/" className="hover:text-gray-200">Home</Link>
-          <Link href="/about" className="hover:text-gray-200">About</Link>
-          <Link href="/overlay" className="hover:text-gray-200">Overlay</Link>
-          {!user && (
+        <div className="hidden md:flex space-x-6 font-medium">
+          <Link href="/" className="hover:text-yellow-300 transition">Home</Link>
+          <Link href="/about" className="hover:text-yellow-300 transition">About</Link>
+          <Link href="/overlay" className="hover:text-yellow-300 transition">Overlay Theme</Link>
+          {!user ? (
             <>
-              <Link href="/login" className="hover:text-gray-200">Login</Link>
-              <Link href="/register" className="hover:text-gray-200">Register</Link>
+              <Link href="/login" className="hover:text-yellow-300 transition">Login</Link>
+              <Link href="/register" className="hover:text-yellow-300 transition">Register</Link>
             </>
-          )}
-          {user && (
+          ) : (
             <button
               onClick={handleLogout}
-              className="flex items-center space-x-1 bg-white text-green-700 px-3 py-1 rounded-md hover:bg-gray-100"
+              className="flex items-center space-x-1 hover:text-yellow-300 transition"
             >
               <LogOut size={18} />
               <span>Logout</span>
@@ -48,37 +49,41 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Hamburger Menu (Mobile) */}
+        {/* Mobile Menu Button */}
         <button
-          className="md:hidden p-2 rounded hover:bg-green-700"
           onClick={() => setMenuOpen(!menuOpen)}
+          className="md:hidden focus:outline-none"
         >
-          {menuOpen ? <X size={24} /> : <Menu size={24} />}
+          {menuOpen ? <X size={26} /> : <Menu size={26} />}
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Dropdown */}
       {menuOpen && (
-        <div className="md:hidden bg-green-700 px-4 py-3 space-y-2">
-          <Link href="/" className="block hover:text-gray-200">Home</Link>
-          <Link href="/about" className="block hover:text-gray-200">About</Link>
-          <Link href="/overlay" className="block hover:text-gray-200">Overlay</Link>
-          {!user && (
+        <div className="md:hidden bg-green-700 px-6 py-4 space-y-3 text-center">
+          <Link href="/" className="block hover:text-yellow-300" onClick={() => setMenuOpen(false)}>Home</Link>
+          <Link href="/about" className="block hover:text-yellow-300" onClick={() => setMenuOpen(false)}>About</Link>
+          <Link href="/overlay" className="block hover:text-yellow-300" onClick={() => setMenuOpen(false)}>Overlay Theme</Link>
+
+          {!user ? (
             <>
-              <Link href="/login" className="block hover:text-gray-200">Login</Link>
-              <Link href="/register" className="block hover:text-gray-200">Register</Link>
+              <Link href="/login" className="block hover:text-yellow-300" onClick={() => setMenuOpen(false)}>Login</Link>
+              <Link href="/register" className="block hover:text-yellow-300" onClick={() => setMenuOpen(false)}>Register</Link>
             </>
-          )}
-          {user && (
+          ) : (
             <button
-              onClick={handleLogout}
-              className="w-full text-left bg-white text-green-700 px-3 py-2 rounded-md hover:bg-gray-100"
+              onClick={() => {
+                handleLogout();
+                setMenuOpen(false);
+              }}
+              className="w-full flex justify-center items-center space-x-1 hover:text-yellow-300 transition"
             >
-              Logout
+              <LogOut size={18} />
+              <span>Logout</span>
             </button>
           )}
         </div>
       )}
     </nav>
   );
-}
+            }
